@@ -10,12 +10,12 @@ fn main() {
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        match input.trim() {
-            "exit" => {
-                break;
-            }
+        let mut input_arr = input.split(" ");
+
+        match input_arr.next().unwrap() {
+            "exit" => break,
             _ => {
-                println!("{}: command not found", input);
+                println!("{}: command not found", input.trim());
             }
         }
     }
