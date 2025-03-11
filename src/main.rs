@@ -19,6 +19,7 @@ fn main() {
                 for ele in input_arr {
                     print!("{} ", ele.trim());
                 }
+                print!("\n");
             }
             _ => {
                 println!("{}: command not found", input.trim());
