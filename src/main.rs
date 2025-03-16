@@ -17,9 +17,15 @@ fn main() {
             "exit" => break,
             "echo" => {
                 for ele in input_arr {
-                    print!("{} ", ele.trim());
+                    print!("{}", ele);
                 }
                 print!("\n");
+            }
+            "type" => {
+                let input = input_arr.next().unwrap().trim();
+                if input == "exit" || input == "echo" || input == "type" {
+                    println!("{} is a shell builtin", input);
+                }
             }
             _ => {
                 println!("{}: command not found", input.trim());
