@@ -17,7 +17,7 @@ fn main() {
             "exit" => break,
             "echo" => {
                 for ele in input_arr {
-                    print!("{}", ele);
+                    print!("{} ", ele);
                 }
                 print!("\n");
             }
