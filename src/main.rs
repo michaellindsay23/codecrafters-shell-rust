@@ -25,6 +25,8 @@ fn main() {
                 let input = input_arr.next().unwrap().trim();
                 if input == "exit" || input == "echo" || input == "type" {
                     println!("{} is a shell builtin", input);
+                } else {
+                    println!("{}: not found", input)
                 }
             }
             _ => {
