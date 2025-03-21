@@ -18,7 +18,7 @@ fn main() {
             "echo" => {
                 let mut input = String::new();
                 input_arr.for_each(|x| input.push_str(&format!("{} ", x)));
-                print!("\n");
+                print!("{}\n", input);
             }
             "type" => {
                 let input = input_arr.next().unwrap().trim();
