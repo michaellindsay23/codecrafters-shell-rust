@@ -16,9 +16,8 @@ fn main() {
         match input_arr.next().unwrap() {
             "exit" => break,
             "echo" => {
-                for ele in input_arr {
-                    print!("{} ", ele);
-                }
+                let mut input = String::new();
+                input_arr.for_each(|x| input.push_str(&format!("{} ", x)));
                 print!("\n");
             }
             "type" => {
