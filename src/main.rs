@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 
 enum Builtin {
+    Exit(),
     Echo(String),
     Type(String),
     Invalid(String),
@@ -9,6 +10,7 @@ enum Builtin {
 impl Builtin {
     fn call(&self) {
         match &self {
+            Builtin::Exit() => todo!(),
             Builtin::Echo(tail) => println!("{}", tail),
             Builtin::Type(tail) => match Builtin::find_type(tail, tail.clone()) {
                 Builtin::Invalid { .. } => println!("{}: not found", tail),
@@ -20,6 +22,7 @@ impl Builtin {
 
     fn find_type(head: &str, tail: String) -> Builtin {
         match head {
+            "exit" => Builtin::Exit(),
             "echo" => Builtin::Echo(tail),
             "type" => Builtin::Type(tail),
             _ => Builtin::Invalid(tail),
