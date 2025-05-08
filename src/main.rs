@@ -1,5 +1,32 @@
 use std::io::{self, Write};
 
+enum Builtin {
+    Echo(String),
+    Type(String),
+    Invalid(String),
+}
+
+impl Builtin {
+    fn call(&self) {
+        match &self {
+            Builtin::Echo(tail) => println!("{}", tail),
+            Builtin::Type(tail) => match Builtin::find_type(tail, tail.clone()) {
+                Builtin::Invalid { .. } => println!("{}: not found", tail),
+                _ => println!("{} is a shell builtin", tail),
+            },
+            Builtin::Invalid(head) => println!("{}: command not found", head),
+        }
+    }
+
+    fn find_type(head: &str, tail: String) -> Builtin {
+        match head {
+            "echo" => Builtin::Echo(tail),
+            "type" => Builtin::Type(tail),
+            _ => Builtin::Invalid(tail),
+        }
+    }
+}
+
 fn main() {
     let stdin = io::stdin();
     let mut input;
@@ -11,26 +38,15 @@ fn main() {
         input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        let mut input_arr = input.split(" ");
+        let mut input_arr = input.split_whitespace();
 
-        match input_arr.next().unwrap() {
-            "exit" => break,
-            "echo" => {
-                let mut input = String::new();
-                input_arr.for_each(|x| input.push_str(&format!("{} ", x)));
-                println!("{}", input);
-            }
-            "type" => {
-                let input = input_arr.next().unwrap().trim();
-                if input == "exit" || input == "echo" || input == "type" {
-                    println!("{} is a shell builtin", input);
-                } else {
-                    println!("{}: not found", input)
-                }
-            }
-            _ => {
-                println!("{}: command not found", input.trim());
-            }
+        let head = input_arr.next().unwrap();
+        let tail: String = input_arr.collect();
+
+        if head.eq("exit") {
+            break;
         }
+
+        Builtin::find_type(head, tail).call();
     }
 }
