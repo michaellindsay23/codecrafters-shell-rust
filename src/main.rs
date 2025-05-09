@@ -40,7 +40,7 @@ impl Builtin {
             str.push_str(s.as_ref());
             str.push_str(" ");
         }
-        return str;
+        return str.trim().to_string();
     }
 }
 
