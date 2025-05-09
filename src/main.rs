@@ -1,31 +1,31 @@
 use std::io::{self, Write};
 
 enum Builtin {
-    Exit(),
+    Exit,
     Echo(String),
     Type(String),
-    Invalid(String),
+    Invalid(String, String),
 }
 
 impl Builtin {
     fn call(&self) {
         match &self {
-            Builtin::Exit() => todo!(),
+            Builtin::Exit => todo!(),
             Builtin::Echo(tail) => println!("{}", tail),
             Builtin::Type(tail) => match Builtin::find_type(tail, tail.clone()) {
-                Builtin::Invalid { .. } => println!("{}: not found", tail),
+                Builtin::Invalid(_head, tail) => println!("{}: not found", tail),
                 _ => println!("{} is a shell builtin", tail),
             },
-            Builtin::Invalid(head) => println!("{}: command not found", head),
+            Builtin::Invalid(head, _tail) => println!("{}: command not found", head),
         }
     }
 
     fn find_type(head: &str, tail: String) -> Builtin {
         match head {
-            "exit" => Builtin::Exit(),
+            "exit" => Builtin::Exit,
             "echo" => Builtin::Echo(tail),
             "type" => Builtin::Type(tail),
-            _ => Builtin::Invalid(tail),
+            _ => Builtin::Invalid(head.to_string(), tail),
         }
     }
 }
