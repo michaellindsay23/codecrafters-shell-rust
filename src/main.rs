@@ -41,10 +41,10 @@ fn main() {
         input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        let mut input_arr = input.split_whitespace();
+        let input_arr = input.split_at(input.find(" ").unwrap());
 
-        let head = input_arr.next().unwrap();
-        let tail: String = input_arr.collect();
+        let head = input_arr.0;
+        let tail: String = input_arr.1.to_string();
 
         if head.eq("exit") {
             break;
