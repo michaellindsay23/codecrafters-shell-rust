@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::os::linux;
 
 enum Builtin {
     Exit,
