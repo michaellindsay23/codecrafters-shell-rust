@@ -2,31 +2,45 @@ use std::io::{self, Write};
 
 enum Builtin {
     Exit,
-    Echo(String),
-    Type(String),
-    Invalid(String, String),
+    Echo(Vec<String>),
+    Type(Vec<String>),
+    Invalid(String, Vec<String>),
 }
 
 impl Builtin {
     fn call(&self) {
         match &self {
             Builtin::Exit => todo!(),
-            Builtin::Echo(tail) => println!("{}", tail),
-            Builtin::Type(tail) => match Builtin::find_type(tail, tail.clone()) {
-                Builtin::Invalid(_head, tail) => println!("{}: not found", tail),
-                _ => println!("{} is a shell builtin", tail),
+            Builtin::Echo(tail) => println!("{}", Builtin::to_valid_str(tail.clone())),
+            Builtin::Type(tail) => match Builtin::find_type(tail[0].clone(), tail.clone()) {
+                Builtin::Invalid(_head, tail) => {
+                    println!("{}: not found", Builtin::to_valid_str(tail))
+                }
+                _ => println!("{} is a shell builtin", tail[0]),
             },
             Builtin::Invalid(head, _tail) => println!("{}: command not found", head),
         }
     }
 
-    fn find_type(head: &str, tail: String) -> Builtin {
-        match head {
+    // Find the Builtin type associated with the given String
+    fn find_type(head: String, tail: Vec<String>) -> Builtin {
+        match head.as_ref() {
             "exit" => Builtin::Exit,
             "echo" => Builtin::Echo(tail),
             "type" => Builtin::Type(tail),
             _ => Builtin::Invalid(head.to_string(), tail),
         }
+    }
+
+    // Converts a Vec<String> to a valid String for printing
+    //   - consists of all vec elements seperated by " "
+    fn to_valid_str(vec: Vec<String>) -> String {
+        let mut str = String::new();
+        for s in vec {
+            str.push_str(s.as_ref());
+            str.push_str(" ");
+        }
+        return str;
     }
 }
 
@@ -41,10 +55,10 @@ fn main() {
         input = String::new();
         stdin.read_line(&mut input).unwrap();
 
-        let input_arr = input.split_at(input.find(" ").unwrap());
+        let mut input_arr = input.split_whitespace().map(str::to_string);
 
-        let head = input_arr.0;
-        let tail: String = input_arr.1.to_string();
+        let head = input_arr.next().unwrap();
+        let tail = input_arr.collect();
 
         if head.eq("exit") {
             break;
