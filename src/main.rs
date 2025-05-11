@@ -16,7 +16,7 @@ enum Builtin {
 impl Builtin {
     fn call(&self) {
         match &self {
-            Builtin::Exit => todo!(),
+            Builtin::Exit => return,
             Builtin::Echo(tail) => println!("{}", Builtin::to_valid_str(tail.clone())),
             Builtin::TypeCMD(tail) => match Builtin::find_type(tail[0].clone(), tail.clone()) {
                 Builtin::Invalid(_head, tail) => {
@@ -24,8 +24,12 @@ impl Builtin {
                 }
                 _ => println!("{} is a shell builtin", tail[0]),
             },
-            Builtin::TypePATH(_tail, paths) => {
-                paths.iter().for_each(|path| println!("{}", path.display()))
+            Builtin::TypePATH(tail, paths) => {
+                for path in paths {
+                    if path.ends_with(&tail[0]) {
+                        println!("type is {}", tail[0]);
+                    }
+                }
             }
             Builtin::Invalid(head, _tail) => println!("{}: command not found", head),
         }
