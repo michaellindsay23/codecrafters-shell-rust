@@ -1,7 +1,7 @@
 use std::{
     env::{self, split_paths},
     io::{self, Write},
-    path::PathBuf,
+    //path::PathBuf,
     //os::linux,
 };
 
@@ -9,7 +9,7 @@ enum Builtin {
     Exit,
     Echo(Vec<String>),
     TypeCMD(Vec<String>),
-    TypePATH(Vec<String>, Vec<PathBuf>),
+    TypePATH(Vec<String>),
     Invalid(String, Vec<String>),
 }
 
@@ -24,12 +24,8 @@ impl Builtin {
                 }
                 _ => println!("{} is a shell builtin", tail[0]),
             },
-            Builtin::TypePATH(tail, paths) => {
-                for path in paths {
-                    if path.ends_with(&tail[0]) {
-                        println!("type is {}", tail[0]);
-                    }
-                }
+            Builtin::TypePATH(tail) => {
+                println!("type is {}", tail[0]);
             }
             Builtin::Invalid(head, _tail) => println!("{}: command not found", head),
         }
@@ -40,10 +36,15 @@ impl Builtin {
         match head.as_ref() {
             "exit" => Builtin::Exit,
             "echo" => Builtin::Echo(tail),
-            "type" => match env::var_os("PATH") {
-                Some(paths) => Builtin::TypePATH(tail, split_paths(&paths).collect()),
-                None => Builtin::TypeCMD(tail),
-            },
+            "type" => {
+                let paths = env::var_os("PATH").unwrap();
+                for path in split_paths(&paths) {
+                    if path.ends_with(&tail[0]) {
+                        return Builtin::TypePATH(tail);
+                    }
+                }
+                Builtin::TypeCMD(tail)
+            }
             _ => Builtin::Invalid(head.to_string(), tail),
         }
     }
