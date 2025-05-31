@@ -1,8 +1,8 @@
 use std::{
     env::{self, split_paths},
+    fs,
     io::{self, Write},
-    //path::PathBuf,
-    //os::linux,
+    path,
 };
 
 enum Builtin {
@@ -38,10 +38,13 @@ impl Builtin {
             "echo" => Builtin::Echo(tail),
             "type" => {
                 let paths = env::var_os("PATH").unwrap();
-                for path in split_paths(&paths) {
-                    println!("{}", &path.as_os_str().to_str().unwrap());
-                    if path.ends_with(&tail[0]) {
-                        return Builtin::TypePATH(tail);
+                for dir_path in split_paths(&paths) {
+                    for entry in fs::read_dir(dir_path) {
+                        for ent in entry {
+                            if ent.unwrap().file_name().into_string().unwrap().eq(&tail[0]) {
+                                return Builtin::TypePATH(tail);
+                            }
+                        }
                     }
                 }
                 Builtin::TypeCMD(tail)
