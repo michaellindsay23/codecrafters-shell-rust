@@ -42,9 +42,11 @@ impl Builtin {
                     let path = Path::new(&dir_path);
                     for ent in fs::read_dir(path).unwrap() {
                         if ent.unwrap().file_name().into_string().unwrap().eq(&tail[0]) {
-                            return Builtin::TypePATH(
+                            return Builtin::TypePATH(format!(
+                                "{}/{}",
                                 dir_path.clone().into_os_string().into_string().unwrap(),
-                            );
+                                tail[0]
+                            ));
                         }
                     }
                 }
