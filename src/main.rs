@@ -1,15 +1,15 @@
 use std::{
     env::{self, split_paths},
+    ffi::OsString,
     fs,
     io::{self, Write},
-    path,
 };
 
 enum Builtin {
     Exit,
     Echo(Vec<String>),
     TypeCMD(Vec<String>),
-    TypePATH(Vec<String>),
+    TypePATH(String),
     Invalid(String, Vec<String>),
 }
 
@@ -25,7 +25,7 @@ impl Builtin {
                 _ => println!("{} is a shell builtin", tail[0]),
             },
             Builtin::TypePATH(tail) => {
-                println!("type is {}", tail[0]);
+                println!("type is {}", tail);
             }
             Builtin::Invalid(head, _tail) => println!("{}: command not found", head),
         }
@@ -41,8 +41,9 @@ impl Builtin {
                 for dir_path in split_paths(&paths) {
                     for entry in fs::read_dir(dir_path) {
                         for ent in entry {
-                            if ent.unwrap().file_name().into_string().unwrap().eq(&tail[0]) {
-                                return Builtin::TypePATH(tail);
+                            let file_path = ent.unwrap().file_name().into_string().unwrap();
+                            if file_path.eq(&tail[0]) {
+                                return Builtin::TypePATH(file_path);
                             }
                         }
                     }
