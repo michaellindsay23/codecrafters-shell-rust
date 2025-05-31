@@ -37,24 +37,29 @@ impl Builtin {
             "exit" => Builtin::Exit,
             "echo" => Builtin::Echo(tail),
             "type" => {
-                let paths = env::var_os("PATH").unwrap();
-                for dir_path in split_paths(&paths) {
-                    let path = Path::new(&dir_path);
-                    for ent in fs::read_dir(path).unwrap() {
-                        if ent.unwrap().file_name().into_string().unwrap().eq(&tail[0]) {
-                            let mut vec = Vec::new();
-                            vec.push(format!(
-                                "{}/{}",
-                                dir_path.clone().into_os_string().into_string().unwrap(),
-                                tail[0].clone()
-                            ));
-                            vec.push(tail[0].clone());
+                let is = Builtin::is_builtin(&tail[0]);
 
-                            return Builtin::TypePATH(vec);
+                if !is {
+                    let paths = env::var_os("PATH").unwrap();
+                    for dir_path in split_paths(&paths) {
+                        let path = Path::new(&dir_path);
+                        for ent in fs::read_dir(path).unwrap() {
+                            if ent.unwrap().file_name().into_string().unwrap().eq(&tail[0]) {
+                                let mut vec = Vec::new();
+                                vec.push(format!(
+                                    "{}/{}",
+                                    dir_path.clone().into_os_string().into_string().unwrap(),
+                                    tail[0].clone()
+                                ));
+                                vec.push(tail[0].clone());
+
+                                return Builtin::TypePATH(vec);
+                            }
                         }
                     }
                 }
-                Builtin::TypeCMD(tail)
+
+                return Builtin::TypeCMD(tail);
             }
             _ => Builtin::Invalid(head.to_string(), tail),
         }
@@ -69,6 +74,13 @@ impl Builtin {
             str.push_str(" ");
         }
         return str.trim().to_string();
+    }
+
+    fn is_builtin(str: &String) -> bool {
+        match str.as_str() {
+            "exit" | "echo" | "type" => true,
+            _ => false,
+        }
     }
 }
 
