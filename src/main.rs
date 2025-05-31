@@ -9,7 +9,7 @@ enum Builtin {
     Exit,
     Echo(Vec<String>),
     TypeCMD(Vec<String>),
-    TypePATH(String),
+    TypePATH(Vec<String>),
     Invalid(String, Vec<String>),
 }
 
@@ -25,7 +25,7 @@ impl Builtin {
                 _ => println!("{} is a shell builtin", tail[0]),
             },
             Builtin::TypePATH(tail) => {
-                println!("{} is {}", tail, tail);
+                println!("{} is {}", tail[1], tail[0]);
             }
             Builtin::Invalid(head, _tail) => println!("{}: command not found", head),
         }
@@ -42,11 +42,15 @@ impl Builtin {
                     let path = Path::new(&dir_path);
                     for ent in fs::read_dir(path).unwrap() {
                         if ent.unwrap().file_name().into_string().unwrap().eq(&tail[0]) {
-                            return Builtin::TypePATH(format!(
+                            let mut vec = Vec::new();
+                            vec.push(format!(
                                 "{}/{}",
                                 dir_path.clone().into_os_string().into_string().unwrap(),
-                                tail[0]
+                                tail[0].clone()
                             ));
+                            vec.push(tail[0].clone());
+
+                            return Builtin::TypePATH(vec);
                         }
                     }
                 }
