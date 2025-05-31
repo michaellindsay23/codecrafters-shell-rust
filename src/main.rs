@@ -1,8 +1,8 @@
 use std::{
     env::{self, split_paths},
-    ffi::OsString,
     fs,
     io::{self, Write},
+    path::Path,
 };
 
 enum Builtin {
@@ -39,12 +39,12 @@ impl Builtin {
             "type" => {
                 let paths = env::var_os("PATH").unwrap();
                 for dir_path in split_paths(&paths) {
-                    for entry in fs::read_dir(dir_path) {
-                        for ent in entry {
-                            let file_path = ent.unwrap().file_name().into_string().unwrap();
-                            if file_path.eq(&tail[0]) {
-                                return Builtin::TypePATH(file_path);
-                            }
+                    let path = Path::new(&dir_path);
+                    for ent in fs::read_dir(path).unwrap() {
+                        if ent.unwrap().file_name().into_string().unwrap().eq(&tail[0]) {
+                            return Builtin::TypePATH(
+                                dir_path.clone().into_os_string().into_string().unwrap(),
+                            );
                         }
                     }
                 }
