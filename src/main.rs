@@ -39,6 +39,7 @@ impl Builtin {
             "type" => {
                 let paths = env::var_os("PATH").unwrap();
                 for path in split_paths(&paths) {
+                    println!("{}", &path.as_os_str().to_str().unwrap());
                     if path.ends_with(&tail[0]) {
                         return Builtin::TypePATH(tail);
                     }
