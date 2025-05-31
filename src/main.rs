@@ -25,7 +25,7 @@ impl Builtin {
                 _ => println!("{} is a shell builtin", tail[0]),
             },
             Builtin::TypePATH(tail) => {
-                println!("type is {}", tail);
+                println!("{} is {}", tail, tail);
             }
             Builtin::Invalid(head, _tail) => println!("{}: command not found", head),
         }
